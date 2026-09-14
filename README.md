@@ -15,6 +15,8 @@ npm run dev
 
 Адрес подписки: `http://localhost:8787/`. Админка: `http://localhost:8787/admin.html`.
 
+Страница `http://localhost:8787/incy` запускает `incy://add/https://freedurev.eu.cc/` и содержит кнопку для ручного открытия приложения.
+
 ## Развёртывание
 
 ```bash

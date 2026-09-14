@@ -125,6 +125,7 @@ input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(107, 231, 
 .button-primary:hover { background: var(--accent-strong); }
 .button:disabled { opacity: .55; cursor: wait; }
 .button-wide { margin-top: 10px; width: 100%; }
+.launcher-button { display: inline-flex; align-items: center; margin-top: 18px; text-decoration: none; }
 .form-message { min-height: 24px; margin-top: 4px; color: var(--muted); font-size: 14px; }
 .form-message.success { color: var(--accent); }
 .form-message.error { color: var(--danger); }
