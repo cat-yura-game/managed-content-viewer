@@ -4,6 +4,12 @@
   "main": "./src/index.ts",
   "compatibility_date": "2026-09-14",
   "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    {
+      "pattern": "freedurev.eu.cc",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
