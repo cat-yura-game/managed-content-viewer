@@ -2,6 +2,21 @@ import { timingSafeEqual } from "node:crypto";
 
 const SETTINGS_KEY = "display-config";
 const MAX_BODY_SIZE = 4096;
+const PROXY_PATHS = new Set(["/", "/subscription"]);
+const BLOCKED_REQUEST_HEADERS = new Set([
+  "authorization",
+  "cf-connecting-ip",
+  "cf-ipcountry",
+  "cf-ray",
+  "cf-visitor",
+  "cookie",
+  "forwarded",
+  "host",
+  "x-forwarded-for",
+  "x-forwarded-host",
+  "x-forwarded-proto",
+  "x-real-ip",
+]);
 
 type StoredConfig = {
   targetUrl: string;
@@ -57,9 +72,69 @@ async function readConfig(env: Env): Promise<StoredConfig> {
   };
 }
 
+function upstreamRequestHeaders(request: Request): Headers {
+  const headers = new Headers();
+
+  for (const [name, value] of request.headers) {
+    const lowerName = name.toLowerCase();
+    if (BLOCKED_REQUEST_HEADERS.has(lowerName) || lowerName.startsWith("cf-")) continue;
+    headers.set(name, value);
+  }
+
+  return headers;
+}
+
+async function proxySubscription(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { Allow: "GET, HEAD" },
+    });
+  }
+
+  const requestUrl = new URL(request.url);
+  const config = await readConfig(env);
+  const upstreamUrl = new URL(config.targetUrl);
+
+  if (upstreamUrl.origin === requestUrl.origin) {
+    return json({ error: "Адрес источника не может указывать на этот же Worker." }, 508);
+  }
+
+  for (const [name, value] of requestUrl.searchParams) {
+    upstreamUrl.searchParams.append(name, value);
+  }
+
+  try {
+    const upstreamResponse = await fetch(upstreamUrl, {
+      method: request.method,
+      headers: upstreamRequestHeaders(request),
+      redirect: "follow",
+    });
+
+    console.log(JSON.stringify({
+      event: "subscription_proxied",
+      hostname: upstreamUrl.hostname,
+      status: upstreamResponse.status,
+    }));
+
+    return new Response(upstreamResponse.body, upstreamResponse);
+  } catch (error) {
+    console.error(JSON.stringify({
+      event: "subscription_proxy_failed",
+      hostname: upstreamUrl.hostname,
+      message: error instanceof Error ? error.message : "Unknown upstream error",
+    }));
+    return json({ error: "Источник подписки временно недоступен." }, 502);
+  }
+}
+
 export default {
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (PROXY_PATHS.has(url.pathname)) {
+      return proxySubscription(request, env);
+    }
 
     if (url.pathname === "/api/config" && request.method === "GET") {
       const config = await readConfig(env);

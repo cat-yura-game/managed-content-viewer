@@ -74,7 +74,7 @@ form.addEventListener("submit", async (event) => {
 
     displayConfig(result);
     adminTokenInput.value = "";
-    showMessage("Ссылка сохранена и уже доступна посетителям.", "success");
+    showMessage("Ссылка сохранена. Worker уже возвращает данные нового источника.", "success");
   } catch (error) {
     showMessage(error instanceof Error ? error.message : "Не удалось сохранить ссылку.", "error");
   } finally {
