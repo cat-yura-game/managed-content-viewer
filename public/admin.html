@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Настройка источника для публичной страницы." />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Настройка источника</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101828'/%3E%3Cpath d='M8 10h16v12H8z' fill='none' stroke='%236be7c8' stroke-width='2'/%3E%3Cpath d='M12 15h8M12 19h5' stroke='%236be7c8' stroke-width='2'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-layout">
+      <a class="back-link" href="/">← Вернуться на сайт</a>
+
+      <section class="admin-card">
+        <div class="card-heading">
+          <span class="eyebrow">Управление</span>
+          <h1>Источник публичной страницы</h1>
+          <p>После сохранения новый адрес сразу станет доступен всем посетителям.</p>
+        </div>
+
+        <div class="current-source">
+          <span>Сейчас используется</span>
+          <a id="currentUrl" href="#" target="_blank" rel="noopener noreferrer">Загрузка…</a>
+          <small id="updatedAt"></small>
+        </div>
+
+        <form id="settingsForm" novalidate>
+          <label for="targetUrl">Новая HTTPS-ссылка</label>
+          <input
+            id="targetUrl"
+            name="targetUrl"
+            type="url"
+            inputmode="url"
+            autocomplete="url"
+            placeholder="https://example.com/page"
+            maxlength="2048"
+            required
+          />
+
+          <label for="adminToken">Пароль администратора</label>
+          <div class="password-row">
+            <input
+              id="adminToken"
+              name="adminToken"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Введите пароль"
+              required
+            />
+            <button id="togglePassword" class="icon-button" type="button" aria-label="Показать пароль">Показать</button>
+          </div>
+
+          <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+          <button id="saveButton" class="button button-primary button-wide" type="submit">Сохранить ссылку</button>
+        </form>
+      </section>
+
+      <p class="security-note">Пароль отправляется только в защищённый API Cloudflare и не сохраняется в браузере.</p>
+    </main>
+
+    <script src="/admin.js" defer></script>
+  </body>
+</html>
